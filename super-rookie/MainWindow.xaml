@@ -1,12 +1,14 @@
-﻿<Window x:Class="super_rookie.MainWindow"
+﻿<mah:MetroWindow x:Class="super_rookie.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:super_rookie"
         xmlns:vm="clr-namespace:super_rookie.ViewModels"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Super Rookie" Height="520" Width="920"
+        WindowTransitionsEnabled="True">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -60,4 +62,4 @@
 
         <TextBlock Grid.Row="3" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Text="{Binding CurrentAmount, StringFormat=Amount: {0:F2}}"/>
     </Grid>
-</Window>
+</mah:MetroWindow>
