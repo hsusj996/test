@@ -28,6 +28,18 @@ namespace super_rookie.ViewModels
             OnPropertyChanged(nameof(IsTriggered));
             OnPropertyChanged(nameof(DiState));
         }
+
+        public DigitalInput SelectedDi
+        {
+            get => Model.StatusDi;
+            set
+            {
+                if (Model.StatusDi == value) return;
+                Model.StatusDi = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DiState));
+            }
+        }
     }
 }
 

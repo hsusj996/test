@@ -55,10 +55,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\LevelToHeightConverter.cs" />
+    <Compile Include="Converters\TriggerToHeightConverter.cs" />
+    <Compile Include="Converters\BooleanToBrushConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
     <Compile Include="Services\SimulationService.cs" />
     <Compile Include="ViewModels\Base\ObservableObject.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\LevelSensorVM.cs" />
+    <Compile Include="ViewModels\UnitVM.cs" />
+    <Compile Include="ViewModels\TankVM.cs" />
     <Compile Include="ViewModels\MainVM.cs" />
     <Compile Include="ViewModels\ValveVM.cs" />
     <Page Include="MainWindow.xaml">
@@ -78,6 +84,7 @@
     <Compile Include="Models\DigitalInput.cs" />
     <Compile Include="Models\DigitalOutput.cs" />
     <Compile Include="Models\LevelSensor.cs" />
+    <Compile Include="Models\Unit.cs" />
     <Compile Include="Models\Tank.cs" />
     <Compile Include="Models\Valve.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -10,7 +10,7 @@ namespace super_rookie.Services
     {
         bool IsRunning { get; }
         double StepSeconds { get; set; }
-        void Configure(Tank tank, IList<Valve> valves, IList<LevelSensor> sensors);
+        void Configure(IList<Unit> units);
         void Start();
         void Stop();
     }
@@ -18,24 +18,20 @@ namespace super_rookie.Services
     public class SimulationService : ISimulationService
     {
         private CancellationTokenSource _cts;
-        private Tank _tank;
-        private IList<Valve> _valves;
-        private IList<LevelSensor> _sensors;
+        private IList<Unit> _units;
 
         public bool IsRunning { get; private set; }
 
         public double StepSeconds { get; set; } = 0.5;
 
-        public void Configure(Tank tank, IList<Valve> valves, IList<LevelSensor> sensors)
+        public void Configure(IList<Unit> units)
         {
-            _tank = tank;
-            _valves = valves;
-            _sensors = sensors;
+            _units = units;
         }
 
         public void Start()
         {
-            if (IsRunning || _tank == null || _valves == null || _sensors == null) return;
+            if (IsRunning || _units == null) return;
             _cts = new CancellationTokenSource();
             IsRunning = true;
             var token = _cts.Token;
@@ -45,9 +41,15 @@ namespace super_rookie.Services
                 {
                     while (!token.IsCancellationRequested)
                     {
-                        foreach (var v in _valves) v.Update();
-                        _tank.Update(StepSeconds);
-                        foreach (var s in _sensors) s.Update(_tank.Amount);
+                        foreach (var unit in _units)
+                        {
+                            foreach (var tank in unit.Tanks)
+                            {
+                                foreach (var v in tank.Valves) v.Update();
+                                tank.Update(StepSeconds);
+                                foreach (var s in tank.LevelSensors) s.Update(tank.Amount);
+                            }
+                        }
                         await Task.Delay(TimeSpan.FromSeconds(StepSeconds), token).ConfigureAwait(false);
                     }
                 }

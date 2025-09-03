@@ -12,16 +12,10 @@ namespace super_rookie.ViewModels
     {
         private readonly ISimulationService _simulationService;
 
-        public ObservableCollection<ValveViewModel> Valves { get; } = new ObservableCollection<ValveViewModel>();
-        public ObservableCollection<LevelSensorViewModel> Sensors { get; } = new ObservableCollection<LevelSensorViewModel>();
+        public ObservableCollection<UnitViewModel> Units { get; } = new ObservableCollection<UnitViewModel>();
 
-        private Tank _tank;
-        public double TankCapacity
-        {
-            get; set;
-        } = 100;
-
-        public double TankInitialAmount { get; set; } = 0;
+        public double DefaultTankCapacity { get; set; } = 100;
+        public double DefaultTankInitialAmount { get; set; } = 0;
 
         public double StepSeconds
         {
@@ -29,18 +23,20 @@ namespace super_rookie.ViewModels
             set { _simulationService.StepSeconds = value; OnPropertyChanged(); }
         }
 
-        private double _currentAmount;
-        public double CurrentAmount
-        {
-            get => _currentAmount;
-            private set => SetProperty(ref _currentAmount, value);
-        }
-
-        public ICommand AddInletValveCommand { get; }
-        public ICommand AddOutletValveCommand { get; }
-        public ICommand AddSensorCommand { get; }
+        public ICommand AddUnitCommand { get; }
+        public ICommand RemoveUnitCommand { get; }
+        public ICommand AddTankToUnitCommand { get; }
+        public ICommand RemoveTankFromUnitCommand { get; }
+        public ICommand AddInletValveToTankCommand { get; }
+        public ICommand AddOutletValveToTankCommand { get; }
+        public ICommand AddSensorToTankCommand { get; }
+        public ICommand ToggleValveCommand { get; }
         public ICommand StartCommand { get; }
         public ICommand StopCommand { get; }
+
+        // Available IO lists (hardcoded 20 each for testing)
+        public ObservableCollection<DigitalOutput> AvailableDos { get; } = new ObservableCollection<DigitalOutput>();
+        public ObservableCollection<DigitalInput> AvailableDis { get; } = new ObservableCollection<DigitalInput>();
 
         public MainViewModel() : this(new SimulationService())
         {
@@ -50,54 +46,112 @@ namespace super_rookie.ViewModels
         {
             _simulationService = simulationService;
 
-            AddInletValveCommand = new RelayCommand(_ => AddValve(ValveType.Inlet));
-            AddOutletValveCommand = new RelayCommand(_ => AddValve(ValveType.Outlet));
-            AddSensorCommand = new RelayCommand(_ => AddSensor());
+            AddUnitCommand = new RelayCommand(_ => AddUnit());
+            RemoveUnitCommand = new RelayCommand(u => RemoveUnit(u as UnitViewModel));
+            AddTankToUnitCommand = new RelayCommand(u => AddTank(u as UnitViewModel));
+            RemoveTankFromUnitCommand = new RelayCommand(t =>
+            {
+                if (t is object[] arr && arr.Length == 2)
+                {
+                    var unit = arr[0] as UnitViewModel;
+                    var tank = arr[1] as TankViewModel;
+                    RemoveTank(unit, tank);
+                }
+            });
+            AddInletValveToTankCommand = new RelayCommand(t => AddValveToTank(t as TankViewModel, ValveType.Inlet));
+            AddOutletValveToTankCommand = new RelayCommand(t => AddValveToTank(t as TankViewModel, ValveType.Outlet));
+            AddSensorToTankCommand = new RelayCommand(t => AddSensorToTank(t as TankViewModel));
+            ToggleValveCommand = new RelayCommand(v => ToggleValve(v as ValveViewModel));
             StartCommand = new RelayCommand(_ => Start());
             StopCommand = new RelayCommand(_ => Stop());
 
             // defaults
-            AddValve(ValveType.Inlet);
-            AddValve(ValveType.Outlet);
-            AddSensor();
+            SeedIo();
+            AddUnit();
         }
 
-        private void AddValve(ValveType type)
+        private void SeedIo()
         {
-            var model = new Valve($"V_{type}_{Valves.Count(v => v.Direction == type)}", type, type == ValveType.Inlet ? 1.0 : 0.5)
+            for (int i = 1; i <= 20; i++)
             {
-                CommandDo = new DigitalOutput($"DO_{type}_{Valves.Count}")
-            };
-            var vm = new ValveViewModel(model);
-            Valves.Add(vm);
+                AvailableDos.Add(new DigitalOutput($"DO_{i:00}"));
+                AvailableDis.Add(new DigitalInput($"DI_{i:00}"));
+            }
         }
 
-        private void AddSensor()
+        private void AddUnit()
         {
-            var model = new LevelSensor($"LS_{Sensors.Count}", 80)
+            if (Units.Count >= 15) return;
+            var unit = new Unit($"U{Units.Count + 1}");
+            var uvm = new UnitViewModel(unit);
+            Units.Add(uvm);
+            // Seed with one tank by default
+            AddTank(uvm);
+        }
+
+        private void RemoveUnit(UnitViewModel uvm)
+        {
+            if (uvm == null) return;
+            Units.Remove(uvm);
+        }
+
+        private void AddTank(UnitViewModel uvm)
+        {
+            if (uvm == null) return;
+            var name = $"T{uvm.Tanks.Count + 1}";
+            var tank = new Tank(name, DefaultTankCapacity, DefaultTankInitialAmount);
+            var tvm = uvm.AddTank(tank);
+            AddValveToTank(tvm, ValveType.Inlet);
+            AddValveToTank(tvm, ValveType.Outlet);
+            AddSensorToTank(tvm);
+        }
+
+        private void RemoveTank(UnitViewModel uvm, TankViewModel tvm)
+        {
+            if (uvm == null || tvm == null) return;
+            uvm.RemoveTank(tvm);
+        }
+
+        private void AddValveToTank(TankViewModel tvm, ValveType type)
+        {
+            if (tvm == null) return;
+            var model = new Valve($"V_{type}_{tvm.Valves.Count(v => v.Direction == type)}", type, type == ValveType.Inlet ? 1.0 : 0.5)
             {
-                StatusDi = new DigitalInput($"DI_LS_{Sensors.Count}")
+                CommandDo = new DigitalOutput($"DO_{tvm.Name}_{type}_{tvm.Valves.Count}")
             };
-            var vm = new LevelSensorViewModel(model);
-            Sensors.Add(vm);
+            tvm.AttachValve(model);
+        }
+
+        private void AddSensorToTank(TankViewModel tvm)
+        {
+            if (tvm == null) return;
+            var model = new LevelSensor($"LS_{tvm.Sensors.Count}", 80)
+            {
+                StatusDi = new DigitalInput($"DI_{tvm.Name}_LS_{tvm.Sensors.Count}")
+            };
+            tvm.AttachSensor(model);
+        }
+
+        private void ToggleValve(ValveViewModel vvm)
+        {
+            if (vvm == null) return;
+            vvm.DoState = !vvm.DoState;
         }
 
         private void Start()
         {
-            _tank = new Tank("T1", TankCapacity, TankInitialAmount);
-            foreach (var v in Valves) _tank.AttachValve(v.Model);
-            foreach (var s in Sensors) _tank.AttachSensor(s.Model);
-            _simulationService.Configure(_tank, Valves.Select(v => v.Model).ToList(), Sensors.Select(s => s.Model).ToList());
+            var units = Units.Select(u => u.Model).ToList();
+            _simulationService.Configure(units);
             _simulationService.Start();
 
-            // UI polling timer for CurrentAmount display
             var timer = new System.Windows.Threading.DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(200);
             timer.Tick += (s, e) =>
             {
-                if (_tank != null) CurrentAmount = _tank.Amount;
-                foreach (var v in Valves) v.NotifyState();
-                foreach (var s2 in Sensors) s2.NotifyState();
+                foreach (var u in Units)
+                {
+                    foreach (var t in u.Tanks) t.NotifyState();
+                }
             };
             timer.Start();
         }

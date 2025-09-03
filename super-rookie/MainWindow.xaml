@@ -8,58 +8,1004 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         Title="Super Rookie" Height="520" Width="920"
-        WindowTransitionsEnabled="True">
+        WindowTransitionsEnabled="True"
+        WindowState="Maximized">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-            <TextBlock Text="Tank Capacity:" VerticalAlignment="Center"/>
-            <TextBox Width="80" Margin="8,0" Text="{Binding TankCapacity, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock Text="Initial Amount:" VerticalAlignment="Center"/>
-            <TextBox Width="80" Margin="8,0" Text="{Binding TankInitialAmount, UpdateSourceTrigger=PropertyChanged}"/>
+        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                <TextBlock Text="Default Capacity:" VerticalAlignment="Center"/>
+                <TextBox Width="80" Margin="8,0" Text="{Binding DefaultTankCapacity, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="Default Initial:" VerticalAlignment="Center"/>
+                <TextBox Width="80" Margin="8,0" Text="{Binding DefaultTankInitialAmount, UpdateSourceTrigger=PropertyChanged}"/>
             <TextBlock Text="Step (s):" VerticalAlignment="Center"/>
             <TextBox Width="60" Margin="8,0" Text="{Binding StepSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Content="Add Unit" Margin="8,0" Command="{Binding AddUnitCommand}"/>
             <Button Content="Start" Margin="8,0" Command="{Binding StartCommand}"/>
             <Button Content="Stop" Margin="8,0" Command="{Binding StopCommand}"/>
         </StackPanel>
+        </DockPanel>
 
-        <GroupBox Header="Valves" Grid.Row="1" Margin="0,0,0,8">
-            <DockPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,8">
-                    <Button Content="Add Inlet" Command="{Binding AddInletValveCommand}" Margin="0,0,8,0"/>
-                    <Button Content="Add Outlet" Command="{Binding AddOutletValveCommand}"/>
-                </StackPanel>
-                <DataGrid ItemsSource="{Binding Valves}" AutoGenerateColumns="False" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding Direction}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="FlowRate" Binding="{Binding FlowRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <DataGridCheckBoxColumn Header="DO" Binding="{Binding DoState, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <DataGridCheckBoxColumn Header="IsOpen" Binding="{Binding IsOpen, Mode=OneWay}" IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-        </GroupBox>
+        <TabControl Grid.Row="1" ItemsSource="{Binding Units}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
 
-        <GroupBox Header="Sensors" Grid.Row="2" Margin="0,0,0,8">
-            <DockPanel>
-                <Button Content="Add Sensor" DockPanel.Dock="Top" Command="{Binding AddSensorCommand}" Margin="0,0,0,8"/>
-                <DataGrid ItemsSource="{Binding Sensors}" AutoGenerateColumns="False" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Trigger" Binding="{Binding TriggerAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <DataGridCheckBoxColumn Header="IsTriggered" Binding="{Binding IsTriggered, Mode=OneWay}" IsReadOnly="True"/>
-                        <DataGridCheckBoxColumn Header="DI" Binding="{Binding DiState, Mode=OneWay}" IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-        </GroupBox>
+                        <!-- 왼쪽: 설정 그리드 (1/4) -->
+                        <Grid Grid.Column="0" Margin="0,0,12,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="3" FontSize="16" FontWeight="Bold" HorizontalAlignment="Right" Text="{Binding CurrentAmount, StringFormat=Amount: {0:F2}}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button Content="Add Tank" Command="{Binding DataContext.AddTankToUnitCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}" Margin="0,0,8,0"/>
+                                <Button Content="Remove Unit" Command="{Binding DataContext.RemoveUnitCommand, RelativeSource={RelativeSource AncestorType=TabControl}}" CommandParameter="{Binding}"/>
+                            </StackPanel>
+
+                            <TabControl Grid.Row="1" ItemsSource="{Binding Tanks}">
+                                <TabControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"/>
+                                    </DataTemplate>
+                                </TabControl.ItemTemplate>
+                                <TabControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Vertical">
+                                            <GroupBox Header="Valves" Margin="0,0,0,8">
+                                                <DockPanel>
+                                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="0,0,0,8">
+                                                        <Button Content="Add Inlet" Command="{Binding DataContext.AddInletValveToTankCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" CommandParameter="{Binding}" Margin="0,0,8,0"/>
+                                                        <Button Content="Add Outlet" Command="{Binding DataContext.AddOutletValveToTankCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" CommandParameter="{Binding}"/>
+                                                    </StackPanel>
+                                                    <DataGrid ItemsSource="{Binding Valves}" AutoGenerateColumns="False" CanUserAddRows="False">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
+                                                            <DataGridTextColumn Header="Type" Binding="{Binding Direction}" IsReadOnly="True"/>
+                                                            <DataGridTextColumn Header="FlowRate" Binding="{Binding FlowRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                            <DataGridTemplateColumn Header="DO">
+                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                    <DataTemplate>
+                                                                        <TextBlock Text="{Binding SelectedDo.Name}"/>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellTemplate>
+                                                                <DataGridTemplateColumn.CellEditingTemplate>
+                                                                    <DataTemplate>
+                                                                        <ComboBox ItemsSource="{Binding DataContext.AvailableDos, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
+                                                                                  SelectedItem="{Binding SelectedDo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                  DisplayMemberPath="Name"/>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellEditingTemplate>
+                                                            </DataGridTemplateColumn>
+                                                            <DataGridCheckBoxColumn Header="IsOpen" Binding="{Binding IsOpen, Mode=OneWay}" IsReadOnly="True"/>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </DockPanel>
+                                            </GroupBox>
+
+                                            <GroupBox Header="Sensors">
+                                                <DockPanel>
+                                                    <Button Content="Add Sensor" DockPanel.Dock="Top" Command="{Binding DataContext.AddSensorToTankCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" CommandParameter="{Binding}" Margin="0,0,0,8"/>
+                                                    <DataGrid ItemsSource="{Binding Sensors}" AutoGenerateColumns="False" CanUserAddRows="False">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
+                                                            <DataGridTextColumn Header="Trigger" Binding="{Binding TriggerAmount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                            <DataGridCheckBoxColumn Header="IsTriggered" Binding="{Binding IsTriggered, Mode=OneWay}" IsReadOnly="True"/>
+                                                            <DataGridTemplateColumn Header="DI">
+                                                                <DataGridTemplateColumn.CellTemplate>
+                                                                    <DataTemplate>
+                                                                        <TextBlock Text="{Binding SelectedDi.Name}"/>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellTemplate>
+                                                                <DataGridTemplateColumn.CellEditingTemplate>
+                                                                    <DataTemplate>
+                                                                        <ComboBox ItemsSource="{Binding DataContext.AvailableDis, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}"
+                                                                                  SelectedItem="{Binding SelectedDi, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                                  DisplayMemberPath="Name"/>
+                                                                    </DataTemplate>
+                                                                </DataGridTemplateColumn.CellEditingTemplate>
+                                                            </DataGridTemplateColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </DockPanel>
+                                            </GroupBox>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </TabControl.ContentTemplate>
+                            </TabControl>
+                        </Grid>
+
+                        <!-- 중간: DIO 그리드 (1/4) -->
+                        <StackPanel Grid.Column="1" Orientation="Vertical" Margin="0,0,12,0">
+                            <GroupBox Header="Digital Outputs (DO)" Margin="0,0,0,8">
+                                <DataGrid ItemsSource="{Binding DataContext.AvailableDos, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" AutoGenerateColumns="False" CanUserAddRows="False" Height="300">
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Setter Property="Background" Value="#333"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding State}" Value="True">
+                                                    <Setter Property="Background" Value="#25d366"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
+                                        <DataGridCheckBoxColumn Header="State" Binding="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </GroupBox>
+
+                            <GroupBox Header="Digital Inputs (DI)">
+                                <DataGrid ItemsSource="{Binding DataContext.AvailableDis, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" AutoGenerateColumns="False" CanUserAddRows="False" Height="300">
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Setter Property="Background" Value="#333"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding State}" Value="True">
+                                                    <Setter Property="Background" Value="#ff4757"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" Width="*"/>
+                                        <DataGridCheckBoxColumn Header="State" Binding="{Binding State, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </GroupBox>
+                        </StackPanel>
+
+                        <!-- 오른쪽: 탱크 시각화 (1/2) -->
+                        <Border Grid.Column="2" Background="#222" CornerRadius="6" Padding="12">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Unit Tank Visualization" Foreground="White" FontWeight="Bold" Margin="0,0,0,8"/>
+                                
+                                <!-- 2x3 그리드로 6등분 -->
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- 탱크 슬롯 1 (0,0) -->
+                                    <Border Grid.Row="0" Grid.Column="0" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[0]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[0], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- 탱크 슬롯 2 (0,1) -->
+                                    <Border Grid.Row="0" Grid.Column="1" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[1]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[1], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                    
+                                    <!-- 빈 슬롯들 (나머지 4개) -->
+                                    <Border Grid.Row="0" Grid.Column="2" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[2]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[2], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Row="1" Grid.Column="0" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[3]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[3], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Row="1" Grid.Column="1" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[4]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[4], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                    <Border Grid.Row="1" Grid.Column="2" Background="#333" CornerRadius="4" Margin="4" BorderBrush="#666" BorderThickness="1">
+                                        <Grid>
+                                            <ContentPresenter Content="{Binding Tanks[5]}">
+                                                <ContentPresenter.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="4">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto"/>
+                                                                <RowDefinition Height="*"/>
+                                                                <RowDefinition Height="Auto"/>
+                                                            </Grid.RowDefinitions>
+                                                            
+                                                            <!-- Inlet Valves -->
+                                                            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Inlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Tank -->
+                                                            <Grid Grid.Row="1" Margin="0,4">
+                                                                <Border Background="#555" CornerRadius="4"/>
+                                                                <Border Background="#2aa1ff" CornerRadius="4" VerticalAlignment="Bottom">
+                                                                    <Border.Height>
+                                                                        <MultiBinding Converter="{StaticResource LevelToHeightConverter}">
+                                                                            <Binding Path="CurrentAmount"/>
+                                                                            <Binding Path="Capacity"/>
+                                                                        </MultiBinding>
+                                                                    </Border.Height>
+                                                                </Border>
+                                                                <TextBlock Text="{Binding Name}" Foreground="White" FontWeight="Bold" 
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Grid>
+                                                            
+                                                            <!-- Outlet Valves -->
+                                                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
+                                                                <ItemsControl ItemsSource="{Binding Valves}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <Button Width="20" Height="20" Margin="2" 
+                                                                                    Background="{Binding IsOpen, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#25d366:#666'}"
+                                                                                    BorderThickness="0" 
+                                                                                    Command="{Binding DataContext.ToggleValveCommand, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}" 
+                                                                                    CommandParameter="{Binding}">
+                                                                                <Button.Style>
+                                                                                    <Style TargetType="Button">
+                                                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Direction}" Value="Outlet">
+                                                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Button.Style>
+                                                                                <Button.Template>
+                                                                                    <ControlTemplate TargetType="Button">
+                                                                                        <Border Background="{TemplateBinding Background}" 
+                                                                                                CornerRadius="10" 
+                                                                                                BorderThickness="0">
+                                                                                            <TextBlock Text="{Binding Direction}" FontSize="8" Foreground="White" 
+                                                                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                        </Border>
+                                                                                    </ControlTemplate>
+                                                                                </Button.Template>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- Level Sensors -->
+                                                            <ItemsControl Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,4">
+                                                                <ItemsControl.ItemsSource>
+                                                                    <Binding Path="Sensors"/>
+                                                                </ItemsControl.ItemsSource>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Border Width="8" Height="8" CornerRadius="4" Margin="0,2" 
+                                                                                Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}, ConverterParameter='#ff4757:#666'}"
+                                                                                VerticalAlignment="Top">
+                                                                            <Border.RenderTransform>
+                                                                                <TranslateTransform Y="{Binding TriggerAmount, Converter={StaticResource TriggerToHeightConverter}, ConverterParameter='200'}"/>
+                                                                            </Border.RenderTransform>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ContentPresenter.ContentTemplate>
+                                            </ContentPresenter>
+                                            <TextBlock Text="Empty" Foreground="#999" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                                       Visibility="{Binding Tanks[5], Converter={StaticResource NullToVisibilityConverter}}"/>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
     </Grid>
 </mah:MetroWindow>

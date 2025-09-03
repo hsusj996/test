@@ -34,6 +34,18 @@ namespace super_rookie.ViewModels
             }
         }
 
+        public DigitalOutput SelectedDo
+        {
+            get => Model.CommandDo;
+            set
+            {
+                if (Model.CommandDo == value) return;
+                Model.CommandDo = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DoState));
+            }
+        }
+
         public void NotifyState()
         {
             OnPropertyChanged(nameof(IsOpen));
