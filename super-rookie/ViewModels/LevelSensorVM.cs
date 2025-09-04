@@ -6,7 +6,15 @@ namespace super_rookie.ViewModels
     public class LevelSensorViewModel : ObservableObject
     {
         public LevelSensor Model { get; }
-        public string Name => Model.Name;
+        public string Name
+        {
+            get => Model.Name;
+            set
+            {
+                Model.Name = value;
+                OnPropertyChanged();
+            }
+        }
 
         public double TriggerAmount
         {
@@ -29,7 +37,7 @@ namespace super_rookie.ViewModels
             OnPropertyChanged(nameof(DiState));
         }
 
-        public DigitalInput SelectedDi
+        public DigitalInput StatusDi
         {
             get => Model.StatusDi;
             set

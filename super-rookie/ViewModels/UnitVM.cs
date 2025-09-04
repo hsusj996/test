@@ -7,9 +7,24 @@ namespace super_rookie.ViewModels
     public class UnitViewModel : ObservableObject
     {
         public Unit Model { get; }
-        public string Name => Model.Name;
+        public string Name
+        {
+            get => Model.Name;
+            set
+            {
+                Model.Name = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ObservableCollection<TankViewModel> Tanks { get; } = new ObservableCollection<TankViewModel>();
+
+        private TankViewModel _selectedTank;
+        public TankViewModel SelectedTank
+        {
+            get => _selectedTank;
+            set => SetProperty(ref _selectedTank, value);
+        }
 
         public UnitViewModel(Unit model)
         {

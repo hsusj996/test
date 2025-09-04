@@ -8,10 +8,10 @@ namespace super_rookie.Models
         public string Name { get; set; }
 
         // Maximum capacity of the tank (same unit as Amount/Volume)
-        public double Capacity { get; private set; }
+        public double Capacity { get; set; }
 
         // Current liquid amount in the tank
-        public double Amount { get; private set; }
+        public double Amount { get; set; }
 
         // Connected valves
         public List<Valve> Valves { get; } = new List<Valve>();

@@ -59,7 +59,24 @@
     <Compile Include="Converters\TriggerToHeightConverter.cs" />
     <Compile Include="Converters\BooleanToBrushConverter.cs" />
     <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Pages\ResultsPage.xaml.cs">
+      <DependentUpon>ResultsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\SimulationService.cs" />
+    <Compile Include="Services\NavigationService.cs" />
+    <Compile Include="Services\SimulationStateService.cs" />
+    <Compile Include="Pages\ConfigurationOverviewPage.xaml.cs">
+      <DependentUpon>ConfigurationOverviewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\UnitConfigurationPage.xaml.cs">
+      <DependentUpon>UnitConfigurationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\TankConfigurationPage.xaml.cs">
+      <DependentUpon>TankConfigurationPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\SimulationPage.xaml.cs">
+      <DependentUpon>SimulationPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\Base\ObservableObject.cs" />
     <Compile Include="ViewModels\Base\RelayCommand.cs" />
     <Compile Include="ViewModels\LevelSensorVM.cs" />
@@ -79,6 +96,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\ConfigurationOverviewPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\ResultsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+    </Page>
+    <Page Include="Pages\UnitConfigurationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\TankConfigurationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Pages\SimulationPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\DigitalInput.cs" />
@@ -115,5 +152,6 @@
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.10" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

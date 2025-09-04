@@ -12,8 +12,25 @@ namespace super_rookie.ViewModels
             Model = model;
         }
 
-        public string Name => Model.Name;
-        public ValveType Direction => Model.Direction;
+        public string Name
+        {
+            get => Model.Name;
+            set
+            {
+                Model.Name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ValveType Direction
+        {
+            get => Model.Direction;
+            set
+            {
+                Model.Direction = value;
+                OnPropertyChanged();
+            }
+        }
 
         public double FlowRate
         {
@@ -34,7 +51,7 @@ namespace super_rookie.ViewModels
             }
         }
 
-        public DigitalOutput SelectedDo
+        public DigitalOutput CommandDo
         {
             get => Model.CommandDo;
             set
