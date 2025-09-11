@@ -1,0 +1,587 @@
+<UserControl x:Class="super_rookie.Pages.ConfigurationPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:super_rookie.UserControls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                  HorizontalScrollBarVisibility="Disabled"
+                  CanContentScroll="False">
+        <Grid Margin="20" MaxHeight="800">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="400"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 유닛 정보 헤더 -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                Background="#F8F9FA" 
+                BorderBrush="#DEE2E6" 
+                BorderThickness="1" 
+                CornerRadius="5" 
+                Padding="15" 
+                Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding Name}" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Foreground="#495057"/>
+                    <TextBlock FontSize="14" 
+                               Foreground="#6C757D" 
+                               Margin="0,5,0,0">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="ChemId: {0} | IP: {1}">
+                                <Binding Path="ChemId"/>
+                                <Binding Path="IpAddress"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <Button Content="시뮬레이션 시작" 
+                            Style="{StaticResource AccentButtonStyle}" 
+                            Margin="0,0,10,0" 
+                            Padding="15,8"/>
+                    <Button Content="설정 저장" 
+                            Margin="0,0,10,0" 
+                            Padding="15,8"/>
+                    <Button Content="설정 불러오기" 
+                            Padding="15,8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 모듈 설정 영역 -->
+        <ScrollViewer Grid.Row="1" Grid.Column="0"
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="False"
+                      Padding="0,0,20,20">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 왼쪽: 탱크, 밸브, 레벨 센서 -->
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <!-- 탱크 설정 -->
+                    <GroupBox Margin="0,0,0,20">
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="탱크 설정" FontWeight="Bold"/>
+                                <Button x:Name="TankToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="TankContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 탱크 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddTankCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Tanks}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#007BFF" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="8" 
+                                                CornerRadius="3"
+                                                Background="#F8F9FF"
+                                                Cursor="Hand"
+                                                MouseLeftButtonUp="TankItem_Click">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="12"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding Capacity, StringFormat='용량: {0}L'}" 
+                                                           FontSize="10" 
+                                                           Foreground="#6C757D"/>
+                                                <TextBlock Grid.Row="2" 
+                                                           Text="{Binding Amount, StringFormat='현재: {0}L'}" 
+                                                           FontSize="10" 
+                                                           Foreground="#6C757D"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- 밸브 설정 -->
+                    <GroupBox Margin="0,0,0,20">
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="밸브 설정" FontWeight="Bold"/>
+                                <Button x:Name="ValveToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="ValveContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 밸브 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddValveCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Valves}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#28A745" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="6" 
+                                                CornerRadius="3"
+                                                Background="#F8FFF9"
+                                                Cursor="Hand"
+                                                MouseLeftButtonUp="ValveItem_Click">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="11"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding Direction}" 
+                                                           FontSize="9" 
+                                                           Foreground="#6C757D"/>
+                                                <TextBlock Grid.Row="2" 
+                                                           Text="{Binding FlowRate, StringFormat='{}{0}L/s'}" 
+                                                           FontSize="9" 
+                                                           Foreground="#6C757D"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- 레벨 센서 설정 -->
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="레벨 센서 설정" FontWeight="Bold"/>
+                                <Button x:Name="LevelSensorToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="LevelSensorContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 레벨 센서 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddLevelSensorCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding LevelSensors}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#6F42C1" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="6" 
+                                                CornerRadius="3"
+                                                Background="#FDF8FF"
+                                                Cursor="Hand">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                
+                                                <TextBlock Grid.Row="0" 
+                                                           Text="{Binding Name}" 
+                                                           FontWeight="Bold" 
+                                                           FontSize="10"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Row="1" 
+                                                           Text="{Binding MaxLevel, StringFormat='최대: {0}mm'}" 
+                                                           FontSize="8" 
+                                                           Foreground="#6C757D"/>
+                                                <TextBlock Grid.Row="2" 
+                                                           Text="{Binding CurrentLevel, StringFormat='현재: {0}mm'}" 
+                                                           FontSize="8" 
+                                                           Foreground="#6C757D"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+
+                <!-- 오른쪽: 히터, 펌프, 믹서 -->
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <!-- 히터 설정 -->
+                    <GroupBox Margin="0,0,0,20">
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="히터 설정" FontWeight="Bold"/>
+                                <Button x:Name="HeaterToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="HeaterContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 히터 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddHeaterCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Heaters}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#FFC107" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="6" 
+                                                CornerRadius="3"
+                                                Background="#FFFDF8"
+                                                Cursor="Hand">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       FontWeight="Bold" 
+                                                       FontSize="10"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- 펌프 설정 -->
+                    <GroupBox Margin="0,0,0,20">
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="펌프 설정" FontWeight="Bold"/>
+                                <Button x:Name="PumpToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="PumpContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 펌프 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddPumpCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Pumps}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#17A2B8" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="6" 
+                                                CornerRadius="3"
+                                                Background="#F8FEFF"
+                                                Cursor="Hand">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       FontWeight="Bold" 
+                                                       FontSize="10"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+
+                    <!-- 믹서 설정 -->
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="믹서 설정" FontWeight="Bold"/>
+                                <Button x:Name="MixerToggleButton" 
+                                        Content="▼" 
+                                        Width="20" 
+                                        Height="20" 
+                                        Margin="10,0,0,0"
+                                        Padding="0"
+                                        FontSize="10"
+                                        Background="Transparent"
+                                        BorderThickness="0"/>
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <Grid Margin="10" x:Name="MixerContent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Button Grid.Row="0" 
+                                    Content="+ 믹서 추가" 
+                                    HorizontalAlignment="Left" 
+                                    Margin="0,0,0,10" 
+                                    Padding="10,5"
+                                    Command="{Binding AddMixerCommand}"/>
+                            
+                            <ItemsControl Grid.Row="1" ItemsSource="{Binding Mixers}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#6F42C1" 
+                                                BorderThickness="1" 
+                                                Margin="2" 
+                                                Padding="6" 
+                                                CornerRadius="3"
+                                                Background="#FDF8FF"
+                                                Cursor="Hand">
+                                            <TextBlock Text="{Binding Name}" 
+                                                       FontWeight="Bold" 
+                                                       FontSize="10"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </GroupBox>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+
+        <!-- 우측 설정 패널 -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Background="#FFFFFF"
+                BorderBrush="#DEE2E6"
+                BorderThickness="1"
+                CornerRadius="5"
+                Margin="0,0,0,20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- 설정 패널 헤더 -->
+                <Border Grid.Row="0" 
+                        Background="#F8F9FA" 
+                        BorderBrush="#DEE2E6" 
+                        BorderThickness="0,0,0,1" 
+                        Padding="15,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Foreground="#495057">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text" Value="모듈 선택"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTank}" Value="{x:Null}">
+                                            <Setter Property="Text" Value="{Binding SelectedValve.Name, StringFormat='{}{0} 설정'}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedValve}" Value="{x:Null}">
+                                            <Setter Property="Text" Value="{Binding SelectedTank.Name, StringFormat='{}{0} 설정'}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button x:Name="CloseSettingsButton"
+                                Content="✕" 
+                                Width="25" 
+                                Height="25" 
+                                Margin="10,0,0,0"
+                                Padding="0"
+                                FontSize="12"
+                                Background="Transparent"
+                                BorderThickness="0"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- 설정 내용 -->
+                <ScrollViewer Grid.Row="1" 
+                              VerticalScrollBarVisibility="Auto" 
+                              HorizontalScrollBarVisibility="Disabled"
+                              Padding="15">
+                    <StackPanel>
+                        <!-- 탱크가 선택되지 않았을 때 -->
+                        <TextBlock Text="모듈을 선택하여 설정을 편집하세요." 
+                                   FontSize="14" 
+                                   Foreground="#6C757D" 
+                                   TextAlignment="Center" 
+                                   Margin="0,50">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTank}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        
+                        <!-- 탱크 설정 UI -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedTank}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <local:TankSettingsControl/>
+                        </StackPanel>
+
+                        <!-- 밸브 설정 UI -->
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedValve}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <local:ValveSettingsControl/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
