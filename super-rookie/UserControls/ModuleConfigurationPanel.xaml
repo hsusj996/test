@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="super_rookie.UserControls.ModuleConfigurationPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:local="clr-namespace:super_rookie.UserControls">
+
+    <Grid Background="White" Margin="0,10,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- 헤더 -->
+            <RowDefinition Height="*"/>
+            <!-- 모듈 그리드들 -->
+        </Grid.RowDefinitions>
+
+        <!-- Module 헤더 -->
+        <Border Grid.Row="0" Background="#ECF0F1" Padding="15,10">
+            <TextBlock Text="Module Configuration" 
+                       FontSize="16" 
+                       FontWeight="Bold" 
+                       Foreground="#2C3E50"/>
+        </Border>
+
+        <!-- 모듈 그리드들 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Margin="15" Orientation="Horizontal">
+                <!-- Tanks 그리드 -->
+                <local:TankGrid Margin="0,0,15,0" Width="300"/>
+
+                <!-- Valves 그리드 -->
+                <local:ValveGrid Margin="0,0,15,0" Width="300"/>
+
+                <!-- Heaters 그리드 -->
+                <local:HeaterGrid Margin="0,0,15,0" Width="300"/>
+
+                <!-- Mixers 그리드 -->
+                <local:MixerGrid Margin="0,0,15,0" Width="300"/>
+
+                <!-- Pumps 그리드 -->
+                <local:PumpGrid Margin="0,0,15,0" Width="300"/>
+
+                <!-- Level Sensors 그리드 -->
+                <local:LevelSensorGrid Margin="0,0,15,0" Width="300"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

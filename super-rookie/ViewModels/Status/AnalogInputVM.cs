@@ -7,34 +7,27 @@ namespace super_rookie.ViewModels.Status
     {
         private readonly AnalogInput _model;
 
+        public AnalogInputVM(AnalogInput model)
+        {
+            _model = model;
+            _status = model.Status;
+        }
+
         public int Id => _model.Id;
         public string Name => _model.Name;
 
-        [ObservableProperty]
         private int _status;
 
-        public AnalogInputVM()
+        public int Status
         {
-            _model = new AnalogInput();
-            _status = 0;
-        }
-
-        public AnalogInputVM(AnalogInput model)
-        {
-            _model = model ?? new AnalogInput();
-            _status = _model.Status;
-        }
-
-        public AnalogInputVM(int id, string name, int status = 0)
-        {
-            _model = new AnalogInput(id, name, status);
-            _status = status;
-        }
-
-        public AnalogInput GetModel()
-        {
-            _model.Status = _status;
-            return _model;
+            get => _status;
+            set
+            {
+                if (SetProperty(ref _status, value))
+                {
+                    _model.Status = value;
+                }
+            }
         }
     }
 }

@@ -1,9 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using super_rookie.Models.Module;
-using super_rookie.ViewModels.Messages;
 
 namespace super_rookie.ViewModels.Module
 {
@@ -11,60 +8,44 @@ namespace super_rookie.ViewModels.Module
     {
         private readonly Tank _model;
 
-        public string Name => _model.Name;
-
-        [ObservableProperty]
-        private double _capacity;
-
-        [ObservableProperty]
-        private double _amount;
-
-        partial void OnCapacityChanged(double value)
-        {
-            WeakReferenceMessenger.Default.Send(new TankLevelChangedMessage(this, value, _amount));
-        }
-
-        partial void OnAmountChanged(double value)
-        {
-            WeakReferenceMessenger.Default.Send(new TankLevelChangedMessage(this, _capacity, value));
-        }
-
-        [ObservableProperty]
-        private ObservableCollection<ValveVM> _valves;
-
-        public TankVM()
-        {
-            _model = new Tank();
-            _capacity = 0;
-            _amount = 0;
-            _valves = new ObservableCollection<ValveVM>();
-        }
-
         public TankVM(Tank model)
         {
-            _model = model ?? new Tank();
-            _capacity = _model.Capacity;
-            _amount = _model.Amount;
-            _valves = new ObservableCollection<ValveVM>(_model.Valves.Select(v => new ValveVM(v)));
+            _model = model;
+            _capacity = model.Capacity;
+            _amount = model.Amount;
+            Valves = new ObservableCollection<ValveVM>();
         }
 
-        public TankVM(string name, double capacity, double amount)
+        public string Name => _model.Name;
+
+        private double _capacity;
+        private double _amount;
+        public ObservableCollection<ValveVM> Valves { get; set; }
+
+        public double Capacity
         {
-            _model = new Tank { Name = name };
-            _capacity = capacity;
-            _amount = amount;
-            _valves = new ObservableCollection<ValveVM>();
+            get => _capacity;
+            set
+            {
+                if (SetProperty(ref _capacity, value))
+                {
+                    _model.Capacity = value;
+                }
+            }
         }
 
-        public Tank GetModel()
+        public double Amount
         {
-            _model.Capacity = _capacity;
-            _model.Amount = _amount;
-            
-            _model.Valves.Clear();
-            _model.Valves.AddRange(_valves.Select(v => v.GetModel()));
-            
-            return _model;
+            get => _amount;
+            set
+            {
+                if (SetProperty(ref _amount, value))
+                {
+                    _model.Amount = value;
+                }
+            }
         }
+
+        public Tank GetModel() => _model;
     }
 }

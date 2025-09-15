@@ -1,262 +1,93 @@
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using super_rookie.Core;
-using super_rookie.Models;
-using super_rookie.ViewModels.Messages;
 
 namespace super_rookie.ViewModels
 {
     public partial class MainVM : ObservableObject
     {
-        [ObservableProperty]
-        private ObservableCollection<MixingUnitVM> _mixingUnits;
+        public ObservableCollection<MixingUnitVM> MixingUnits { get; set; }
 
-        [ObservableProperty]
         private MixingUnitVM? _selectedMixingUnit;
 
-        [ObservableProperty]
-        private bool _isLoading;
-
-        [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
-        public MainVM()
+        public MixingUnitVM? SelectedMixingUnit
         {
-            _mixingUnits = new ObservableCollection<MixingUnitVM>();
-            _selectedMixingUnit = null;
-            _isLoading = false;
-            _statusMessage = "Ready";
-            
-            
-            LoadMixingUnitsFromStore();
-        }
-
-        // MixingUnit management methods
-        public void AddMixingUnit(MixingUnitVM mixingUnit)
-        {
-            if (mixingUnit != null)
+            get => _selectedMixingUnit;
+            set
             {
-                _mixingUnits.Add(mixingUnit);
-                UpdateStatusMessage($"Added mixing unit: {mixingUnit.Name}");
-            }
-        }
-
-        public void AddMixingUnit(string chemId, string ipAddress, string name)
-        {
-            var mixingUnit = new MixingUnitVM(chemId, ipAddress, name);
-            AddMixingUnit(mixingUnit);
-        }
-
-        public void RemoveMixingUnit(MixingUnitVM mixingUnit)
-        {
-            if (mixingUnit != null && _mixingUnits.Contains(mixingUnit))
-            {
-                _mixingUnits.Remove(mixingUnit);
-                UpdateStatusMessage($"Removed mixing unit: {mixingUnit.Name}");
-                
-                // Clear selection if removed unit was selected
-                if (_selectedMixingUnit == mixingUnit)
+                if (_selectedMixingUnit != value)
                 {
-                    SelectedMixingUnit = null;
+                    _selectedMixingUnit = value;
+                    OnPropertyChanged(nameof(SelectedMixingUnit));
                 }
             }
         }
 
-        public void RemoveMixingUnitAt(int index)
+        public ICommand SelectMixingUnitCommand { get; }
+
+        public MainVM()
         {
-            if (index >= 0 && index < _mixingUnits.Count)
+            MixingUnits = new ObservableCollection<MixingUnitVM>();
+            SelectMixingUnitCommand = new SelectMixingUnitCommand(this);
+            LoadMixingUnits();
+            
+            // 첫 번째 유닛을 기본 선택으로 설정
+            if (MixingUnits.Count > 0)
             {
-                var mixingUnit = _mixingUnits[index];
-                RemoveMixingUnit(mixingUnit);
+                SelectMixingUnit(MixingUnits[0]);
             }
         }
 
-        public void ClearAllMixingUnits()
-        {
-            _mixingUnits.Clear();
-            SelectedMixingUnit = null;
-            UpdateStatusMessage("Cleared all mixing units");
-        }
-
-        // Selection management
-        partial void OnSelectedMixingUnitChanged(MixingUnitVM? value)
-        {
-            if (value != null)
-            {
-                UpdateStatusMessage($"Selected mixing unit: {value.Name}");
-            }
-            else
-            {
-                UpdateStatusMessage("No mixing unit selected");
-            }
-        }
-
-        // Utility methods
-        public MixingUnitVM? GetMixingUnitByChemId(string chemId)
-        {
-            return _mixingUnits.FirstOrDefault(mu => mu.ChemId == chemId);
-        }
-
-        public MixingUnitVM? GetMixingUnitByIpAddress(string ipAddress)
-        {
-            return _mixingUnits.FirstOrDefault(mu => mu.IpAddress == ipAddress);
-        }
-
-        public MixingUnitVM? GetMixingUnitByName(string name)
-        {
-            return _mixingUnits.FirstOrDefault(mu => mu.Name == name);
-        }
-
-        public bool ContainsMixingUnit(string chemId)
-        {
-            return _mixingUnits.Any(mu => mu.ChemId == chemId);
-        }
-
-        public int GetMixingUnitCount()
-        {
-            return _mixingUnits.Count;
-        }
-
-        // Status management
-        private void UpdateStatusMessage(string message)
-        {
-            StatusMessage = message;
-        }
-
-        public void SetLoading(bool isLoading, string? message = null)
-        {
-            IsLoading = isLoading;
-            if (message != null)
-            {
-                StatusMessage = message;
-            }
-            else if (!isLoading)
-            {
-                StatusMessage = "Ready";
-            }
-        }
-
-        // Load from Store
-        private void LoadMixingUnitsFromStore()
+        private void LoadMixingUnits()
         {
             var store = MixingUnitStore.Instance;
             foreach (var mixingUnit in store.MixingUnits)
             {
-                var mixingUnitVM = new MixingUnitVM(mixingUnit);
-                _mixingUnits.Add(mixingUnitVM);
+                MixingUnits.Add(new MixingUnitVM(mixingUnit));
             }
-            UpdateStatusMessage($"Loaded {_mixingUnits.Count} mixing units from store");
         }
 
-        // Data operations
-        public void LoadMixingUnits(IEnumerable<MixingUnit> mixingUnits)
+        public void SelectMixingUnit(MixingUnitVM? mixingUnit)
         {
-            SetLoading(true, "Loading mixing units...");
-            
-            try
+            if (mixingUnit == null) return;
+
+            // 이전 선택 해제
+            if (SelectedMixingUnit != null)
             {
-                ClearAllMixingUnits();
-                
-                foreach (var mixingUnit in mixingUnits)
-                {
-                    var mixingUnitVM = new MixingUnitVM(mixingUnit);
-                    _mixingUnits.Add(mixingUnitVM);
-                }
-                
-                UpdateStatusMessage($"Loaded {_mixingUnits.Count} mixing units");
+                SelectedMixingUnit.IsSelected = false;
             }
-            finally
+
+            // 새 선택 설정
+            SelectedMixingUnit = mixingUnit;
+            SelectedMixingUnit.IsSelected = true;
+        }
+    }
+
+    public class SelectMixingUnitCommand : ICommand
+    {
+        private readonly MainVM _mainVM;
+
+        public SelectMixingUnitCommand(MainVM mainVM)
+        {
+            _mainVM = mainVM;
+        }
+
+        public event EventHandler CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
+        {
+            return parameter is MixingUnitVM;
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is MixingUnitVM mixingUnit)
             {
-                SetLoading(false);
+                _mainVM.SelectMixingUnit(mixingUnit);
             }
-        }
-
-        public List<MixingUnit> GetAllMixingUnitsAsModels()
-        {
-            return _mixingUnits.Select(mu => mu.GetModel()).ToList();
-        }
-
-        // Statistics
-        public int GetTotalTanksCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Tanks.Count);
-        }
-
-        public int GetTotalValvesCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Valves.Count);
-        }
-
-        public int GetTotalLevelSensorsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.LevelSensors.Count);
-        }
-
-        public int GetTotalHeatersCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Heaters.Count);
-        }
-
-        public int GetTotalMixersCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Mixers.Count);
-        }
-
-        public int GetTotalPumpsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Pumps.Count);
-        }
-
-        public int GetTotalDigitalInputsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.DigitalInputs.Count);
-        }
-
-        public int GetTotalDigitalOutputsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.DigitalOutputs.Count);
-        }
-
-        public int GetTotalAnalogInputsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.AnalogInputs.Count);
-        }
-
-        public int GetTotalFunctionsCount()
-        {
-            return _mixingUnits.Sum(mu => mu.Functions.Count);
-        }
-
-        // Validation
-        public bool ValidateMixingUnit(MixingUnitVM mixingUnit)
-        {
-            if (mixingUnit == null) return false;
-            
-            // Check for duplicate ChemId
-            var existingByChemId = _mixingUnits.FirstOrDefault(mu => mu.ChemId == mixingUnit.ChemId && mu != mixingUnit);
-            if (existingByChemId != null) return false;
-            
-            // Check for duplicate IP Address
-            var existingByIp = _mixingUnits.FirstOrDefault(mu => mu.IpAddress == mixingUnit.IpAddress && mu != mixingUnit);
-            if (existingByIp != null) return false;
-            
-            return true;
-        }
-
-        public string GetValidationMessage(MixingUnitVM mixingUnit)
-        {
-            if (mixingUnit == null) return "Mixing unit is null";
-            
-            var existingByChemId = _mixingUnits.FirstOrDefault(mu => mu.ChemId == mixingUnit.ChemId && mu != mixingUnit);
-            if (existingByChemId != null) return $"ChemId '{mixingUnit.ChemId}' already exists";
-            
-            var existingByIp = _mixingUnits.FirstOrDefault(mu => mu.IpAddress == mixingUnit.IpAddress && mu != mixingUnit);
-            if (existingByIp != null) return $"IP Address '{mixingUnit.IpAddress}' already exists";
-            
-            return "Valid";
         }
     }
 }

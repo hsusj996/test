@@ -7,34 +7,29 @@ namespace super_rookie.ViewModels.Status
     {
         private readonly DigitalOutput _model;
 
+        public DigitalOutputVM(DigitalOutput model)
+        {
+            _model = model;
+            _status = model.Status;
+        }
+
         public int Id => _model.Id;
         public string Name => _model.Name;
 
-        [ObservableProperty]
         private bool _status;
 
-        public DigitalOutputVM()
+        public bool Status
         {
-            _model = new DigitalOutput();
-            _status = false;
+            get => _status;
+            set
+            {
+                if (SetProperty(ref _status, value))
+                {
+                    _model.Status = value;
+                }
+            }
         }
 
-        public DigitalOutputVM(DigitalOutput model)
-        {
-            _model = model ?? new DigitalOutput();
-            _status = _model.Status;
-        }
-
-        public DigitalOutputVM(int id, string name, bool status = false)
-        {
-            _model = new DigitalOutput(id, name, status);
-            _status = status;
-        }
-
-        public DigitalOutput GetModel()
-        {
-            _model.Status = _status;
-            return _model;
-        }
+        public DigitalOutput GetModel() => _model;
     }
 }

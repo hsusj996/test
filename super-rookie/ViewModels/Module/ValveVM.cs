@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using super_rookie.Models.Module;
-using super_rookie.Models.Status;
 using super_rookie.ViewModels.Status;
 
 namespace super_rookie.ViewModels.Module
@@ -11,52 +10,57 @@ namespace super_rookie.ViewModels.Module
 
         public string Name => _model.Name;
 
-        [ObservableProperty]
         private bool _isOpen;
-
-        [ObservableProperty]
         private double _flowRate;
-
-        [ObservableProperty]
         private ValveType _direction;
-
-        [ObservableProperty]
         private DigitalOutputVM? _commandDo;
 
-        public ValveVM()
+        public bool IsOpen
         {
-            _model = new Valve();
-            _isOpen = false;
-            _flowRate = 0;
-            _direction = ValveType.Inlet;
-            _commandDo = null;
+            get => _isOpen;
+            set
+            {
+                if (SetProperty(ref _isOpen, value))
+                {
+                    _model.IsOpen = value;
+                }
+            }
         }
 
-        public ValveVM(Valve model)
+        public double FlowRate
         {
-            _model = model ?? new Valve();
-            _isOpen = _model.IsOpen;
-            _flowRate = _model.FlowRate;
-            _direction = _model.Direction;
-            _commandDo = _model.CommandDo != null ? new DigitalOutputVM(_model.CommandDo) : null;
+            get => _flowRate;
+            set
+            {
+                if (SetProperty(ref _flowRate, value))
+                {
+                    _model.FlowRate = value;
+                }
+            }
         }
 
-        public ValveVM(string name, ValveType direction, double flowRate)
+        public ValveType Direction
         {
-            _model = new Valve { Name = name };
-            _isOpen = false;
-            _flowRate = flowRate;
-            _direction = direction;
-            _commandDo = null;
+            get => _direction;
+            set
+            {
+                if (SetProperty(ref _direction, value))
+                {
+                    _model.Direction = value;
+                }
+            }
         }
 
-        public Valve GetModel()
+        public DigitalOutputVM? CommandDo
         {
-            _model.IsOpen = _isOpen;
-            _model.FlowRate = _flowRate;
-            _model.Direction = _direction;
-            _model.CommandDo = _commandDo?.GetModel();
-            return _model;
+            get => _commandDo;
+            set
+            {
+                if (SetProperty(ref _commandDo, value))
+                {
+                    _model.CommandDo = value?.GetModel();
+                }
+            }
         }
     }
 }
