@@ -8,7 +8,24 @@ namespace super_rookie.ViewModels.Module
     {
         private readonly Heater _model;
 
-        public string Name => _model.Name;
+        public HeaterVM(Heater model)
+        {
+            _model = model;
+            _name = model.Name;
+        }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (SetProperty(ref _name, value))
+                {
+                    _model.Name = value;
+                }
+            }
+        }
 
         private DigitalOutputVM? _controlOutput;
         private DigitalInputVM? _statusInput;

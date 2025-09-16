@@ -4,42 +4,57 @@
              xmlns:local="clr-namespace:super_rookie.UserControls">
 
     <Grid Background="White" Margin="0,10,0,0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- 헤더 -->
-            <RowDefinition Height="*"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
             <!-- 모듈 그리드들 -->
-        </Grid.RowDefinitions>
+            <ColumnDefinition Width="20"/>
+            <!-- 구분선 -->
+            <ColumnDefinition Width="0.3*"/>
+            <!-- 설정 패널 -->
+        </Grid.ColumnDefinitions>
 
-        <!-- Module 헤더 -->
-        <Border Grid.Row="0" Background="#ECF0F1" Padding="15,10">
-            <TextBlock Text="Module Configuration" 
-                       FontSize="16" 
-                       FontWeight="Bold" 
-                       Foreground="#2C3E50"/>
-        </Border>
+        <!-- 구분선 -->
+        <Border Grid.Column="1" Background="#BDC3C7" Width="2"/>
 
         <!-- 모듈 그리드들 -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <StackPanel Margin="15" Orientation="Horizontal">
+        <ScrollViewer Grid.Column="0"
+                      VerticalScrollBarVisibility="Disabled" 
+                      HorizontalScrollBarVisibility="Auto">
+            <StackPanel Margin="15" 
+                        Orientation="Horizontal">
                 <!-- Tanks 그리드 -->
-                <local:TankGrid Margin="0,0,15,0" Width="300"/>
+                <local:TankGrid Width="300" 
+                                Margin="0,0,15,0" 
+                                DataContext="{Binding SelectedMixingUnit}"/>
 
                 <!-- Valves 그리드 -->
-                <local:ValveGrid Margin="0,0,15,0" Width="300"/>
+                <local:ValveGrid Width="300" 
+                                 Margin="0,0,15,0" 
+                                 DataContext="{Binding SelectedMixingUnit}"/>
 
                 <!-- Heaters 그리드 -->
-                <local:HeaterGrid Margin="0,0,15,0" Width="300"/>
+                <local:HeaterGrid Width="300" 
+                                  Margin="0,0,15,0" 
+                                  DataContext="{Binding SelectedMixingUnit}"/>
 
                 <!-- Mixers 그리드 -->
-                <local:MixerGrid Margin="0,0,15,0" Width="300"/>
+                <local:MixerGrid Width="300" 
+                                 Margin="0,0,15,0" 
+                                 DataContext="{Binding SelectedMixingUnit}"/>
 
                 <!-- Pumps 그리드 -->
-                <local:PumpGrid Margin="0,0,15,0" Width="300"/>
+                <local:PumpGrid Width="300" 
+                                Margin="0,0,15,0" 
+                                DataContext="{Binding SelectedMixingUnit}"/>
 
                 <!-- Level Sensors 그리드 -->
-                <local:LevelSensorGrid Margin="0,0,15,0" Width="300"/>
+                <local:LevelSensorGrid Width="300" 
+                                       Margin="0,0,15,0" 
+                                       DataContext="{Binding SelectedMixingUnit}"/>
             </StackPanel>
         </ScrollViewer>
+
+        <!-- 우측 설정 패널 -->
+        <local:SettingsPanel Grid.Column="2" DataContext="{Binding SelectedMixingUnit}"/>
     </Grid>
 </UserControl>

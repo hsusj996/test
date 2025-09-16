@@ -8,7 +8,26 @@ namespace super_rookie.ViewModels.Module
     {
         private readonly LevelSensor _model;
 
-        public string Name => _model.Name;
+        public LevelSensorVM(LevelSensor model)
+        {
+            _model = model;
+            _name = model.Name;
+            _triggerAmount = model.TriggerAmount;
+            _isTriggered = model.IsTriggered;
+        }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (SetProperty(ref _name, value))
+                {
+                    _model.Name = value;
+                }
+            }
+        }
 
         private double _triggerAmount;
         private bool _isTriggered;

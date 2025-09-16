@@ -11,12 +11,24 @@ namespace super_rookie.ViewModels.Module
         public TankVM(Tank model)
         {
             _model = model;
+            _name = model.Name;
             _capacity = model.Capacity;
             _amount = model.Amount;
             Valves = new ObservableCollection<ValveVM>();
         }
 
-        public string Name => _model.Name;
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (SetProperty(ref _name, value))
+                {
+                    _model.Name = value;
+                }
+            }
+        }
 
         private double _capacity;
         private double _amount;

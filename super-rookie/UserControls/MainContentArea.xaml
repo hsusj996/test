@@ -4,22 +4,7 @@
              xmlns:local="clr-namespace:super_rookie.UserControls">
 
     <Grid Margin="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <!-- 모듈/상태 리스트 -->
-            <ColumnDefinition Width="20"/>
-            <!-- 구분선 -->
-            <ColumnDefinition Width="0.2*"/>
-            <!-- 설정 패널 -->
-        </Grid.ColumnDefinitions>
-
-        <!-- 구분선 -->
-        <Border Grid.Column="1" Background="#BDC3C7" Width="2"/>
-
         <!-- 메인 콘텐츠 영역 -->
-        <local:MainContentPanel Grid.Column="0"/>
-
-        <!-- 우측 설정 패널 -->
-        <local:SettingsPanel Grid.Column="2"/>
+        <local:MainContentPanel/>
     </Grid>
 </UserControl>

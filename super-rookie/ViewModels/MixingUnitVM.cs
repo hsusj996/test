@@ -49,6 +49,124 @@ namespace super_rookie.ViewModels
         public ObservableCollection<MixerVM> Mixers { get; set; }
         public ObservableCollection<PumpVM> Pumps { get; set; }
 
+        // Selected Modules (각 타입별로 독립적)
+        private TankVM _selectedTank;
+        public TankVM SelectedTank
+        {
+            get => _selectedTank;
+            set
+            {
+                if (_selectedTank != value)
+                {
+                    _selectedTank = value;
+                    OnPropertyChanged(nameof(SelectedTank));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        private ValveVM _selectedValve;
+        public ValveVM SelectedValve
+        {
+            get => _selectedValve;
+            set
+            {
+                if (_selectedValve != value)
+                {
+                    _selectedValve = value;
+                    OnPropertyChanged(nameof(SelectedValve));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        private HeaterVM _selectedHeater;
+        public HeaterVM SelectedHeater
+        {
+            get => _selectedHeater;
+            set
+            {
+                if (_selectedHeater != value)
+                {
+                    _selectedHeater = value;
+                    OnPropertyChanged(nameof(SelectedHeater));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        private MixerVM _selectedMixer;
+        public MixerVM SelectedMixer
+        {
+            get => _selectedMixer;
+            set
+            {
+                if (_selectedMixer != value)
+                {
+                    _selectedMixer = value;
+                    OnPropertyChanged(nameof(SelectedMixer));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        private PumpVM _selectedPump;
+        public PumpVM SelectedPump
+        {
+            get => _selectedPump;
+            set
+            {
+                if (_selectedPump != value)
+                {
+                    _selectedPump = value;
+                    OnPropertyChanged(nameof(SelectedPump));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        private LevelSensorVM _selectedLevelSensor;
+        public LevelSensorVM SelectedLevelSensor
+        {
+            get => _selectedLevelSensor;
+            set
+            {
+                if (_selectedLevelSensor != value)
+                {
+                    _selectedLevelSensor = value;
+                    OnPropertyChanged(nameof(SelectedLevelSensor));
+                    UpdateSelectedModule();
+                }
+            }
+        }
+
+        // 통합된 SelectedModule (설정 패널용)
+        private object _selectedModule;
+        public object SelectedModule
+        {
+            get => _selectedModule;
+            set
+            {
+                if (_selectedModule != value)
+                {
+                    _selectedModule = value;
+                    OnPropertyChanged(nameof(SelectedModule));
+                }
+            }
+        }
+
+        private void UpdateSelectedModule()
+        {
+            // 가장 최근에 선택된 모듈을 SelectedModule로 설정
+            var newSelectedModule = _selectedTank ?? (object)_selectedValve ?? (object)_selectedHeater ?? 
+                                  (object)_selectedMixer ?? (object)_selectedPump ?? (object)_selectedLevelSensor;
+            
+            if (SelectedModule != newSelectedModule)
+            {
+                SelectedModule = newSelectedModule;
+            }
+        }
+
         private void InitializeCollections()
         {
             // Status ViewModels 초기화
@@ -67,6 +185,7 @@ namespace super_rookie.ViewModels
 
             // 모델 데이터를 ViewModel로 변환
             LoadStatusData();
+            LoadModuleData();
         }
 
         private void LoadStatusData()
@@ -89,6 +208,39 @@ namespace super_rookie.ViewModels
             foreach (var analogInput in _model.AnalogInputs)
             {
                 AnalogInputs.Add(new AnalogInputVM(analogInput));
+            }
+        }
+
+        private void LoadModuleData()
+        {
+            foreach (var tank in _model.Tanks)
+            {
+                Tanks.Add(new TankVM(tank));
+            }
+
+            foreach (var valve in _model.Valves)
+            {
+                Valves.Add(new ValveVM(valve));
+            }
+
+            foreach (var levelSensor in _model.LevelSensors)
+            {
+                LevelSensors.Add(new LevelSensorVM(levelSensor));
+            }
+
+            foreach (var heater in _model.Heaters)
+            {
+                Heaters.Add(new HeaterVM(heater));
+            }
+
+            foreach (var mixer in _model.Mixers)
+            {
+                Mixers.Add(new MixerVM(mixer));
+            }
+
+            foreach (var pump in _model.Pumps)
+            {
+                Pumps.Add(new PumpVM(pump));
             }
         }
     }

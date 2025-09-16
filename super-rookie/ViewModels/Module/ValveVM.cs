@@ -8,7 +8,27 @@ namespace super_rookie.ViewModels.Module
     {
         private readonly Valve _model;
 
-        public string Name => _model.Name;
+        public ValveVM(Valve model)
+        {
+            _model = model;
+            _name = model.Name;
+            _isOpen = model.IsOpen;
+            _flowRate = model.FlowRate;
+            _direction = model.Direction;
+        }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (SetProperty(ref _name, value))
+                {
+                    _model.Name = value;
+                }
+            }
+        }
 
         private bool _isOpen;
         private double _flowRate;
