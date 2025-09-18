@@ -1,0 +1,152 @@
+    <UserControl x:Class="super_rookie.UserControls.Monitoring.TankMonitoringControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="#E8F4FD">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Tank 영역 헤더 -->
+        <Border Grid.Row="0" 
+                Background="#3498DB" 
+                Padding="15,10">
+            <TextBlock Text="Tank Modules" 
+                       FontSize="16" 
+                       FontWeight="Bold" 
+                       Foreground="White"
+                       HorizontalAlignment="Center"/>
+        </Border>
+        
+        <!-- 탱크 개수만큼 영역을 나누는 콘텐츠 -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto"
+                      Margin="10">
+            <ItemsControl ItemsSource="{Binding Tanks}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- 개별 탱크 영역 (3구간으로 나눔) -->
+                        <Border Background="White" 
+                                BorderBrush="#BDC3C7" 
+                                BorderThickness="1" 
+                                CornerRadius="5" 
+                                Margin="5" 
+                                Padding="10"
+                                Width="400"
+                                VerticalAlignment="Stretch">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <!-- 탱크 제목 -->
+                                    <RowDefinition Height="*"/>
+                                    <!-- Inlet Valve 영역 -->
+                                    <RowDefinition Height="2*"/>
+                                    <!-- 탱크 본체 영역 -->
+                                    <RowDefinition Height="*"/>
+                                    <!-- Outlet Valve 영역 -->
+                                </Grid.RowDefinitions>
+                                
+                                <!-- 탱크 제목 -->
+                                <TextBlock Grid.Row="0" 
+                                           Text="{Binding Name}" 
+                                           FontSize="14" 
+                                           FontWeight="Bold" 
+                                           Foreground="#2C3E50" 
+                                           HorizontalAlignment="Center" 
+                                           Margin="0,0,0,10"/>
+                                
+                                <!-- Inlet Valve 영역 -->
+                                <Border Grid.Row="1" 
+                                        Background="#E8F5E8" 
+                                        BorderBrush="#27AE60" 
+                                        BorderThickness="1" 
+                                        CornerRadius="3" 
+                                        Margin="5">
+                                    <StackPanel Orientation="Horizontal" 
+                                                HorizontalAlignment="Center" 
+                                                VerticalAlignment="Center">
+                                        <Ellipse Width="8" 
+                                                 Height="8" 
+                                                 Fill="#27AE60" 
+                                                 Margin="0,0,5,0"/>
+                                        <TextBlock Text="Inlet Valve" 
+                                                   FontSize="10" 
+                                                   Foreground="#2C3E50"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- 탱크 본체 영역 -->
+                                <Border Grid.Row="2" 
+                                        Background="#E3F2FD" 
+                                        BorderBrush="#2196F3" 
+                                        BorderThickness="2" 
+                                        CornerRadius="3" 
+                                        Margin="5">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <!-- 레벨 표시 -->
+                                        <TextBlock Grid.Row="0" 
+                                                   Text="Level: 50%" 
+                                                   FontSize="10" 
+                                                   Foreground="#1976D2" 
+                                                   HorizontalAlignment="Center" 
+                                                   Margin="0,5,0,0"/>
+                                        
+                                        <!-- 탱크 내용 -->
+                                        <TextBlock Grid.Row="1" 
+                                                   Text="Tank" 
+                                                   FontSize="12" 
+                                                   FontWeight="Bold" 
+                                                   Foreground="#1976D2" 
+                                                   HorizontalAlignment="Center" 
+                                                   VerticalAlignment="Center"/>
+                                        
+                                        <!-- 온도 표시 -->
+                                        <TextBlock Grid.Row="2" 
+                                                   Text="25°C" 
+                                                   FontSize="10" 
+                                                   Foreground="#1976D2" 
+                                                   HorizontalAlignment="Center" 
+                                                   Margin="0,0,0,5"/>
+                                    </Grid>
+                                </Border>
+                                
+                                <!-- Outlet Valve 영역 -->
+                                <Border Grid.Row="3" 
+                                        Background="#FFEBEE" 
+                                        BorderBrush="#E91E63" 
+                                        BorderThickness="1" 
+                                        CornerRadius="3" 
+                                        Margin="5">
+                                    <StackPanel Orientation="Horizontal" 
+                                                HorizontalAlignment="Center" 
+                                                VerticalAlignment="Center">
+                                        <Ellipse Width="8" 
+                                                 Height="8" 
+                                                 Fill="#E91E63" 
+                                                 Margin="0,0,5,0"/>
+                                        <TextBlock Text="Outlet Valve" 
+                                                   FontSize="10" 
+                                                   Foreground="#2C3E50"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

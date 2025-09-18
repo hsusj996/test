@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using super_rookie.Core;
@@ -27,11 +28,19 @@ namespace super_rookie.ViewModels
         }
 
         public ICommand SelectMixingUnitCommand { get; }
+        public ICommand StartCommand { get; }
+        public ICommand StopCommand { get; }
+        public ICommand SettingsCommand { get; }
+        public ICommand HelpCommand { get; }
 
         public MainVM()
         {
             MixingUnits = new ObservableCollection<MixingUnitVM>();
             SelectMixingUnitCommand = new SelectMixingUnitCommand(this);
+            StartCommand = new RelayCommand(StartOperation);
+            StopCommand = new RelayCommand(StopOperation);
+            SettingsCommand = new RelayCommand(OpenSettings);
+            HelpCommand = new RelayCommand(ShowHelp);
             LoadMixingUnits();
             
             // 첫 번째 유닛을 기본 선택으로 설정
@@ -64,6 +73,27 @@ namespace super_rookie.ViewModels
             SelectedMixingUnit = mixingUnit;
             SelectedMixingUnit.IsSelected = true;
         }
+
+        // 리본 메뉴 명령어 메서드들
+        private void StartOperation()
+        {
+            MessageBox.Show("시작 버튼이 클릭되었습니다!", "시작", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void StopOperation()
+        {
+            MessageBox.Show("정지 버튼이 클릭되었습니다!", "정지", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void OpenSettings()
+        {
+            MessageBox.Show("설정 버튼이 클릭되었습니다!", "설정", MessageBoxButton.OK, MessageBoxImage.Question);
+        }
+
+        private void ShowHelp()
+        {
+            MessageBox.Show("도움말 버튼이 클릭되었습니다!", "도움말", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 
     public class SelectMixingUnitCommand : ICommand
@@ -88,6 +118,35 @@ namespace super_rookie.ViewModels
             {
                 _mainVM.SelectMixingUnit(mixingUnit);
             }
+        }
+    }
+
+    // 간단한 RelayCommand 클래스 (초급자용)
+    public class RelayCommand : ICommand
+    {
+        private readonly Action _execute;
+        private readonly Func<bool> _canExecute;
+
+        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute?.Invoke() ?? true;
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute();
         }
     }
 }
