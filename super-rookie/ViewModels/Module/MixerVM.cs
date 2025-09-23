@@ -53,5 +53,18 @@ namespace super_rookie.ViewModels.Module
                 }
             }
         }
+
+        public Mixer GetModel() => _model;
+
+        /// <summary>
+        /// 믹서 시뮬레이션 업데이트
+        /// </summary>
+        public void Update()
+        {
+            // TODO: 믹서 시뮬레이션 로직 구현
+            // - 회전 속도 제어 시뮬레이션
+            // - 디지털 출력 상태 반영
+            // - 상태 입력 모니터링
+        }
     }
 }

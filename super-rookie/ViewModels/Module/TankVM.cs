@@ -59,5 +59,36 @@ namespace super_rookie.ViewModels.Module
         }
 
         public Tank GetModel() => _model;
+
+        /// <summary>
+        /// 탱크 시뮬레이션 업데이트
+        /// </summary>
+        public void Update()
+        {
+            // 시뮬레이션 간격: 100ms = 0.1초
+            const double simulationIntervalSeconds = 0.1;
+            
+            // 연결된 밸브들을 순회하면서 유량 계산
+            foreach (var valve in Valves)
+            {
+                if (valve.IsOpen)
+                {
+                    // FlowRate는 초당 유량이므로 시뮬레이션 간격에 맞춰 계산
+                    double flowAmount = valve.FlowRate * simulationIntervalSeconds;
+                    
+                    // 밸브 타입에 따라 Amount 증감
+                    if (valve.Direction == Models.Module.ValveType.Inlet)
+                    {
+                        // Inlet 밸브: 유체 유입 (Amount 증가)
+                        Amount = System.Math.Min(Amount + flowAmount, Capacity);
+                    }
+                    else if (valve.Direction == Models.Module.ValveType.Outlet)
+                    {
+                        // Outlet 밸브: 유체 유출 (Amount 감소)
+                        Amount = System.Math.Max(Amount - flowAmount, 0);
+                    }
+                }
+            }
+        }
     }
 }

@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
              xmlns:local="clr-namespace:super_rookie.UserControls.Layout"
         xmlns:monitoring="clr-namespace:super_rookie.UserControls.Monitoring"
-        xmlns:settings="clr-namespace:super_rookie.UserControls.Settings">
+        xmlns:settings="clr-namespace:super_rookie.UserControls.Settings"
+        xmlns:test="clr-namespace:super_rookie.UserControls.Test">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -55,6 +56,19 @@
                 </TabItem.HeaderTemplate>
                 <!-- Sequence Monitoring 콘텐츠 -->
                 <monitoring:SequenceMonitoringPanel/>
+            </TabItem>
+            <TabItem Header="Test" 
+                     FontSize="14" 
+                     FontWeight="Bold"
+                     Padding="20,10">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="Test" 
+                                   Foreground="#2C3E50"/>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <!-- Test 콘텐츠 -->
+                <test:TestPanel/>
             </TabItem>
 
         </TabControl>

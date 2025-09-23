@@ -82,5 +82,18 @@ namespace super_rookie.ViewModels.Module
                 }
             }
         }
+
+        public Valve GetModel() => _model;
+
+        /// <summary>
+        /// 밸브 시뮬레이션 업데이트
+        /// </summary>
+        public void Update()
+        {
+            // TODO: 밸브 시뮬레이션 로직 구현
+            // - 밸브 개폐 상태 시뮬레이션
+            // - 유량 변화 시뮬레이션
+            // - 디지털 출력 상태 반영
+        }
     }
 }

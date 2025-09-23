@@ -85,5 +85,18 @@ namespace super_rookie.ViewModels.Module
         // Tank의 현재 레벨과 최대 레벨에 대한 읽기 전용 속성
         public double CurrentLevel => _tank?.Amount ?? 0;
         public double MaxLevel => _tank?.Capacity ?? 0;
+
+        public LevelSensor GetModel() => _model;
+
+        /// <summary>
+        /// 레벨 센서 시뮬레이션 업데이트
+        /// </summary>
+        public void Update()
+        {
+            // TODO: 레벨 센서 시뮬레이션 로직 구현
+            // - 탱크 레벨 모니터링
+            // - 트리거 상태 업데이트
+            // - 디지털 입력 상태 반영
+        }
     }
 }

@@ -5,11 +5,14 @@ using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using super_rookie.Core;
+using super_rookie.Services;
 
 namespace super_rookie.ViewModels
 {
     public partial class MainVM : ObservableObject
     {
+        private readonly SimulationService _simulationService;
+
         public ObservableCollection<MixingUnitVM> MixingUnits { get; set; }
 
         private MixingUnitVM? _selectedMixingUnit;
@@ -32,15 +35,18 @@ namespace super_rookie.ViewModels
         public ICommand StopCommand { get; }
         public ICommand SettingsCommand { get; }
         public ICommand HelpCommand { get; }
+        public ICommand ToggleValveCommand { get; }
 
         public MainVM()
         {
+            _simulationService = new SimulationService();
             MixingUnits = new ObservableCollection<MixingUnitVM>();
             SelectMixingUnitCommand = new SelectMixingUnitCommand(this);
-            StartCommand = new RelayCommand(StartOperation);
-            StopCommand = new RelayCommand(StopOperation);
+            StartCommand = new RelayCommand(StartOperation, CanStartOperation);
+            StopCommand = new RelayCommand(StopOperation, CanStopOperation);
             SettingsCommand = new RelayCommand(OpenSettings);
             HelpCommand = new RelayCommand(ShowHelp);
+            ToggleValveCommand = new RelayCommand<Module.ValveVM>(ToggleValve);
             LoadMixingUnits();
             
             // 첫 번째 유닛을 기본 선택으로 설정
@@ -77,12 +83,45 @@ namespace super_rookie.ViewModels
         // 리본 메뉴 명령어 메서드들
         private void StartOperation()
         {
-            MessageBox.Show("시작 버튼이 클릭되었습니다!", "시작", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (SelectedMixingUnit == null)
+            {
+                MessageBox.Show("시뮬레이션할 MixingUnit을 선택해주세요.", "오류", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                _simulationService.StartSimulation(SelectedMixingUnit, 100); // 100ms 간격
+                MessageBox.Show($"시뮬레이션이 시작되었습니다!\n유닛: {SelectedMixingUnit.Name}", "시뮬레이션 시작", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message, "오류", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void StopOperation()
         {
-            MessageBox.Show("정지 버튼이 클릭되었습니다!", "정지", MessageBoxButton.OK, MessageBoxImage.Warning);
+            try
+            {
+                _simulationService.StopSimulation();
+                MessageBox.Show("시뮬레이션이 정지되었습니다.", "시뮬레이션 정지", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"시뮬레이션 정지 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // 명령어 실행 가능 여부 확인
+        private bool CanStartOperation()
+        {
+            return SelectedMixingUnit != null && !_simulationService.IsRunning;
+        }
+
+        private bool CanStopOperation()
+        {
+            return _simulationService.IsRunning;
         }
 
         private void OpenSettings()
@@ -93,6 +132,30 @@ namespace super_rookie.ViewModels
         private void ShowHelp()
         {
             MessageBox.Show("도움말 버튼이 클릭되었습니다!", "도움말", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// 밸브 상태 토글
+        /// </summary>
+        private void ToggleValve(Module.ValveVM valve)
+        {
+            if (valve == null) return;
+
+            valve.IsOpen = !valve.IsOpen;
+            
+            string status = valve.IsOpen ? "열림" : "닫힘";
+            MessageBox.Show($"밸브 '{valve.Name}'이(가) {status} 상태로 변경되었습니다.", 
+                          "밸브 제어", 
+                          MessageBoxButton.OK, 
+                          MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// 리소스 정리
+        /// </summary>
+        public void Dispose()
+        {
+            _simulationService?.Dispose();
         }
     }
 
@@ -147,6 +210,35 @@ namespace super_rookie.ViewModels
         public void Execute(object parameter)
         {
             _execute();
+        }
+    }
+
+    // 매개변수를 받는 RelayCommand 클래스
+    public class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T> _execute;
+        private readonly Func<T, bool> _canExecute;
+
+        public RelayCommand(Action<T> execute, Func<T, bool> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute?.Invoke((T)parameter) ?? true;
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute((T)parameter);
         }
     }
 }
