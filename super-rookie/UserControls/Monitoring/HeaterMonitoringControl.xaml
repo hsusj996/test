@@ -11,15 +11,15 @@
         <!-- Heater 영역 헤더 -->
         <Border Grid.Row="0" 
                 Background="#E74C3C" 
-                Padding="10,8">
-            <TextBlock Text="Heater" 
-                       FontSize="14" 
+                Padding="15,10">
+            <TextBlock Text="Heater Modules" 
+                       FontSize="16" 
                        FontWeight="Bold" 
                        Foreground="White"
                        HorizontalAlignment="Center"/>
         </Border>
         
-        <!-- Heater 영역 콘텐츠 -->
+        <!-- 히터 개수만큼 영역을 나누는 콘텐츠 -->
         <ScrollViewer Grid.Row="1" 
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto"
@@ -32,49 +32,102 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <!-- 개별 Heater 영역 -->
+                        <!-- 개별 히터 영역 (표 형태) -->
                         <Border Background="White" 
-                                BorderBrush="#E74C3C" 
-                                BorderThickness="2" 
+                                BorderBrush="#BDC3C7" 
+                                BorderThickness="1" 
                                 CornerRadius="5" 
                                 Margin="5" 
-                                Padding="10"
-                                Width="150"
+                                Padding="15"
+                                Width="300"
                                 VerticalAlignment="Stretch">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 
-                                <!-- Heater 제목 -->
+                                <!-- 히터 제목 -->
                                 <TextBlock Grid.Row="0" 
                                            Text="{Binding Name}" 
-                                           FontSize="12" 
+                                           FontSize="16" 
                                            FontWeight="Bold" 
-                                           Foreground="#E74C3C" 
+                                           Foreground="#2C3E50" 
                                            HorizontalAlignment="Center" 
-                                           Margin="0,0,0,10"/>
+                                           Margin="0,0,0,15"/>
                                 
-                                <!-- Heater 상태 -->
-                                <Border Grid.Row="1" 
-                                        Background="#FFEBEE" 
-                                        BorderBrush="#E74C3C" 
-                                        BorderThickness="1" 
-                                        CornerRadius="3" 
-                                        Margin="5">
-                                    <StackPanel HorizontalAlignment="Center" 
-                                                VerticalAlignment="Center">
-                                        <Ellipse Width="20" 
-                                                 Height="20" 
-                                                 Fill="#E74C3C" 
-                                                 Margin="0,0,0,5"/>
-                                        <TextBlock Text="Heater" 
-                                                   FontSize="10" 
-                                                   Foreground="#E74C3C"
+                                <!-- 제어 출력 상태 -->
+                                <Grid Grid.Row="1" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
+                                               Text="제어:" 
+                                               FontSize="12" 
+                                               FontWeight="Bold" 
+                                               Foreground="#7F8C8D" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="{Binding ControlOutput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                               FontSize="12" 
+                                               Foreground="#2C3E50" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                                
+                                <!-- 상태 입력 -->
+                                <Grid Grid.Row="2" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
+                                               Text="상태:" 
+                                               FontSize="12" 
+                                               FontWeight="Bold" 
+                                               Foreground="#7F8C8D" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="{Binding StatusInput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                               FontSize="12" 
+                                               Foreground="#E74C3C" 
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                                
+                                <!-- 상태 표시 -->
+                                <Grid Grid.Row="3">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- 상태 헤더 -->
+                                    <TextBlock Grid.Row="0" 
+                                               Text="상태 표시:" 
+                                               FontSize="11" 
+                                               FontWeight="Bold" 
+                                               Foreground="#7F8C8D" 
+                                               Margin="0,0,0,5"/>
+                                    
+                                    <!-- 상태 표시 -->
+                                    <Border Grid.Row="1" 
+                                            Background="{Binding StatusInput.Status, Converter={StaticResource BooleanToBrushConverter}}" 
+                                            BorderBrush="#E74C3C" 
+                                            BorderThickness="1" 
+                                            CornerRadius="3" 
+                                            Margin="2" 
+                                            Padding="5,2">
+                                        <TextBlock Text="{Binding StatusInput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                                   FontSize="9" 
+                                                   Foreground="White"
                                                    HorizontalAlignment="Center"/>
-                                    </StackPanel>
-                                </Border>
+                                    </Border>
+                                </Grid>
                             </Grid>
                         </Border>
                     </DataTemplate>

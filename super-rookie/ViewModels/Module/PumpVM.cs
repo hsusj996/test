@@ -61,10 +61,11 @@ namespace super_rookie.ViewModels.Module
         /// </summary>
         public void Update()
         {
-            // TODO: 펌프 시뮬레이션 로직 구현
-            // - 유량 제어 시뮬레이션
-            // - 디지털 출력 상태 반영
-            // - 상태 입력 모니터링
+            // ControlOutput이 켜지면 StatusInput을 켜줌
+            if (_controlOutput != null && _statusInput != null)
+            {
+                _statusInput.Status = _controlOutput.Status;
+            }
         }
     }
 }

@@ -93,10 +93,20 @@ namespace super_rookie.ViewModels.Module
         /// </summary>
         public void Update()
         {
-            // TODO: 레벨 센서 시뮬레이션 로직 구현
-            // - 탱크 레벨 모니터링
-            // - 트리거 상태 업데이트
-            // - 디지털 입력 상태 반영
+            // 탱크가 연결되어 있고, 현재 레벨이 트리거 레벨 이상이면 센서 활성화
+            if (_tank != null)
+            {
+                bool shouldTrigger = _tank.Amount >= _triggerAmount;
+                
+                // IsTriggered 상태 업데이트
+                IsTriggered = shouldTrigger;
+                
+                // DigitalInput 상태도 동일하게 업데이트
+                if (_statusDi != null)
+                {
+                    _statusDi.Status = shouldTrigger;
+                }
+            }
         }
     }
 }

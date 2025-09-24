@@ -1,30 +1,30 @@
-    <UserControl x:Class="super_rookie.UserControls.Monitoring.MixerMonitoringControl"
+    <UserControl x:Class="super_rookie.UserControls.Monitoring.LevelSensorMonitoringControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Background="#F0F8E8">
+    <Grid Background="#F8F9FA">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Mixer 영역 헤더 -->
+        <!-- LevelSensor 영역 헤더 -->
         <Border Grid.Row="0" 
-                Background="#27AE60" 
+                Background="#9B59B6" 
                 Padding="15,10">
-            <TextBlock Text="Mixer Modules" 
+            <TextBlock Text="Level Sensor Modules" 
                        FontSize="16" 
                        FontWeight="Bold" 
                        Foreground="White"
                        HorizontalAlignment="Center"/>
         </Border>
         
-        <!-- 믹서 개수만큼 영역을 나누는 콘텐츠 -->
+        <!-- 레벨 센서 개수만큼 영역을 나누는 콘텐츠 -->
         <ScrollViewer Grid.Row="1" 
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto"
                       Margin="10">
-            <ItemsControl ItemsSource="{Binding Mixers}">
+            <ItemsControl ItemsSource="{Binding LevelSensors}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -32,7 +32,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <!-- 개별 믹서 영역 (표 형태) -->
+                        <!-- 개별 레벨 센서 영역 (표 형태) -->
                         <Border Background="White" 
                                 BorderBrush="#BDC3C7" 
                                 BorderThickness="1" 
@@ -47,9 +47,11 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 
-                                <!-- 믹서 제목 -->
+                                <!-- 레벨 센서 제목 -->
                                 <TextBlock Grid.Row="0" 
                                            Text="{Binding Name}" 
                                            FontSize="16" 
@@ -58,7 +60,7 @@
                                            HorizontalAlignment="Center" 
                                            Margin="0,0,0,15"/>
                                 
-                                <!-- 제어 출력 상태 -->
+                                <!-- 트리거 레벨 -->
                                 <Grid Grid.Row="1" Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -66,19 +68,19 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" 
-                                               Text="제어:" 
+                                               Text="트리거 레벨:" 
                                                FontSize="12" 
                                                FontWeight="Bold" 
                                                Foreground="#7F8C8D" 
                                                VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="2" 
-                                               Text="{Binding ControlOutput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                               Text="{Binding TriggerAmount, StringFormat={}{0:F1}L}" 
                                                FontSize="12" 
                                                Foreground="#2C3E50" 
                                                VerticalAlignment="Center"/>
                                 </Grid>
                                 
-                                <!-- 상태 입력 -->
+                                <!-- 현재 레벨 -->
                                 <Grid Grid.Row="2" Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
@@ -86,21 +88,62 @@
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" 
-                                               Text="상태:" 
+                                               Text="현재 레벨:" 
                                                FontSize="12" 
                                                FontWeight="Bold" 
                                                Foreground="#7F8C8D" 
                                                VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="2" 
-                                               Text="{Binding StatusInput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                               Text="{Binding CurrentLevel, StringFormat={}{0:F1}L}" 
                                                FontSize="12" 
-                                               Foreground="#27AE60" 
+                                               Foreground="#2C3E50" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                                
+                                <!-- 트리거 상태 -->
+                                <Grid Grid.Row="3" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
+                                               Text="트리거:" 
+                                               FontSize="12" 
+                                               FontWeight="Bold" 
+                                               Foreground="#7F8C8D" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="{Binding IsTriggered, StringFormat={}{0:트리거됨/대기중}}" 
+                                               FontSize="12" 
+                                               Foreground="#9B59B6" 
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                                
+                                <!-- 상태 입력 -->
+                                <Grid Grid.Row="4" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
+                                               Text="상태 입력:" 
+                                               FontSize="12" 
+                                               FontWeight="Bold" 
+                                               Foreground="#7F8C8D" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="{Binding StatusDi.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                               FontSize="12" 
+                                               Foreground="#9B59B6" 
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"/>
                                 </Grid>
                                 
                                 <!-- 상태 표시 -->
-                                <Grid Grid.Row="3">
+                                <Grid Grid.Row="5">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
@@ -116,13 +159,13 @@
                                     
                                     <!-- 상태 표시 -->
                                     <Border Grid.Row="1" 
-                                            Background="{Binding StatusInput.Status, Converter={StaticResource BooleanToBrushConverter}}" 
-                                            BorderBrush="#27AE60" 
+                                            Background="{Binding IsTriggered, Converter={StaticResource BooleanToBrushConverter}}" 
+                                            BorderBrush="#9B59B6" 
                                             BorderThickness="1" 
                                             CornerRadius="3" 
                                             Margin="2" 
                                             Padding="5,2">
-                                        <TextBlock Text="{Binding StatusInput.Status, StringFormat={}{0:켜짐/꺼짐}}" 
+                                        <TextBlock Text="{Binding IsTriggered, StringFormat={}{0:트리거됨/대기중}}" 
                                                    FontSize="9" 
                                                    Foreground="White"
                                                    HorizontalAlignment="Center"/>

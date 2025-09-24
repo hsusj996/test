@@ -36,6 +36,7 @@ namespace super_rookie.ViewModels
         public ICommand SettingsCommand { get; }
         public ICommand HelpCommand { get; }
         public ICommand ToggleValveCommand { get; }
+        public ICommand ToggleDigitalOutputCommand { get; }
 
         public MainVM()
         {
@@ -47,6 +48,7 @@ namespace super_rookie.ViewModels
             SettingsCommand = new RelayCommand(OpenSettings);
             HelpCommand = new RelayCommand(ShowHelp);
             ToggleValveCommand = new RelayCommand<Module.ValveVM>(ToggleValve);
+            ToggleDigitalOutputCommand = new RelayCommand<Status.DigitalOutputVM>(ToggleDigitalOutput);
             LoadMixingUnits();
             
             // 첫 번째 유닛을 기본 선택으로 설정
@@ -146,6 +148,22 @@ namespace super_rookie.ViewModels
             string status = valve.IsOpen ? "열림" : "닫힘";
             MessageBox.Show($"밸브 '{valve.Name}'이(가) {status} 상태로 변경되었습니다.", 
                           "밸브 제어", 
+                          MessageBoxButton.OK, 
+                          MessageBoxImage.Information);
+        }
+
+        /// <summary>
+        /// Digital Output 상태 토글
+        /// </summary>
+        private void ToggleDigitalOutput(Status.DigitalOutputVM digitalOutput)
+        {
+            if (digitalOutput == null) return;
+
+            digitalOutput.Status = !digitalOutput.Status;
+            
+            string status = digitalOutput.Status ? "켜짐" : "꺼짐";
+            MessageBox.Show($"Digital Output '{digitalOutput.Name}'이(가) {status} 상태로 변경되었습니다.", 
+                          "Digital Output 제어", 
                           MessageBoxButton.OK, 
                           MessageBoxImage.Information);
         }
